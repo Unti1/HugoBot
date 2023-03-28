@@ -1,0 +1,10 @@
+*.ini
+chromedriver*
+*.json
+*.log
+bin
+include
+lib
+lib64
+__pycache__
+pyvenv.cfg
