@@ -1,16 +1,9 @@
 from settings import *
 from tools import *
 
-async def main():
-    global q
-    q = Parser()
-    await q.__init__()
-
 if __name__ == '__main__':
+    q = Parser()
     loop = asyncio.get_event_loop()
-    # loop.create_task()
-    # executor.start_polling(dp, on_shutdown=shutdown)
-    
-    loop.run_until_complete(main())
-    # print(q.kwork_data)
+    loop.create_task(regular_posting_kwork(q))
+    executor.start_polling(dp, loop = loop,on_shutdown=shutdown)
     

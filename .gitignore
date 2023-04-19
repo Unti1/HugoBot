@@ -8,3 +8,5 @@ lib
 lib64
 __pycache__
 pyvenv.cfg
+*test*
+data/block_keywords.txt

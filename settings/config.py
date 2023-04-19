@@ -18,9 +18,11 @@ from aiogram.utils import executor
 from aiogram.utils.helper import Helper, HelperMode, ListItem
 from aiogram.contrib.fsm_storage.memory import MemoryStorage
 from aiogram.contrib.middlewares.logging import LoggingMiddleware
+
 ####
 
 import configparser
+import json
 import requests
 config = configparser.ConfigParser()
 config.read(r'settings/settings.ini')  # читаем конфиг

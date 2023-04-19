@@ -1,13 +1,13 @@
 from settings import *
 
 class Parser():
-    async def __init__(self):
+    def __init__(self):
         self.driver:webdriver.Chrome = None
-        self.browser_startUp(PROFILE_ID = config["Parser"]["profile_id"],invisable=False)
+        self.browser_startUp(PROFILE_ID = config["Parser"]["profile_id"],invisable=True)
         self.wait = WebDriverWait(self.driver,15)
         self.kwork_data = {}
 
-    async def browser_startUp(self, PROFILE_ID,invisable):
+    def browser_startUp(self, PROFILE_ID,invisable):
         """Создание настройка и создания эмуляции браузера
         """
         
@@ -15,7 +15,7 @@ class Parser():
         chrome_drive_path = Service('./settings/chromedriver-linux')
         options = webdriver.ChromeOptions()
         reg_url = f'http://localhost:3001/v1.0/browser_profiles/{PROFILE_ID}/start?automation=1'
-        response = await requests.get(reg_url)
+        response = requests.get(reg_url)
         respons_json = response.json()
         PORT = str(respons_json['automation']['port'])
         options.debugger_address = '127.0.0.1:'+ PORT
@@ -27,7 +27,7 @@ class Parser():
             options.add_argument('--headless')
         options.add_argument('--no-sandbox')
 
-        self.driver = await webdriver.Chrome(service=chrome_drive_path,chrome_options=options)
+        self.driver = webdriver.Chrome(service=chrome_drive_path,chrome_options=options)
     
     async def kwork_parse(self):
         import time
@@ -40,12 +40,18 @@ class Parser():
             if "показать полностью" in card.text.lower():
                 more = self.driver.find_element(By.XPATH,f'//div[@data-id][{ind+1}]//span[@class="link_local"][1]')
                 self.driver.execute_script("arguments[0].click();", more)
-            
             title = self.driver.find_element(By.XPATH,f'//div[@data-id][{ind+1}]//a[1]').text
             link = self.driver.find_element(By.XPATH,f'//div[@data-id][{ind+1}]//a[1]').get_attribute("href")
             author = self.driver.find_elements(By.XPATH,f'//div[@data-id][{ind+1}]//a')[1].text
             cost = self.driver.find_element(By.XPATH,f'//div[@data-id][{ind+1}]//div[@class="wants-card__header-right-block"]').text
             description = self.driver.find_element(By.XPATH,f'//div[@data-id][{ind+1}]//div[@class="wants-card__description-text br-with-lh"]').text
+            
+            with open("data/block_keywords.txt","r") as fl:
+                text = fl.read()
+                block_keywords = text.split(", ")
+            
             if title not in self.kwork_data.keys():
-                self.kwork_data[title] = {"link":link,"author":author,'cost': cost, 'description':description}
-        print(self.kwork_data)
+                for block_keyword in block_keywords:
+                    if block_keyword not in title.lower() and block_keywords not in description.lower():
+                        self.kwork_data[title] = {"link":link,"author":author,'cost': cost, 'description':description}
+        return(self.kwork_data)
